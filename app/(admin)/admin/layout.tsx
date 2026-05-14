@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { apiFetch, ApiError } from "@/lib/api";
@@ -28,10 +29,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen flex bg-obsidian">
       <aside className="relative w-60 shrink-0 border-r border-border bg-elevated/30 flex flex-col">
-        <div className="px-5 py-5 border-b border-border">
-          <div className="text-[11px] tracking-[2px] font-bold text-fg-tertiary">ADMIN</div>
-          <div className="font-display text-2xl tracking-tight mt-1">
-            jo<span className="text-fg-secondary">ï</span>n
+        <div className="px-5 py-5 border-b border-border flex items-center gap-3">
+          <Image
+            src="/logo.svg"
+            alt="join"
+            width={36}
+            height={36}
+            className="rounded-md shrink-0"
+            priority
+          />
+          <div>
+            <div className="text-[11px] tracking-[2px] font-bold text-fg-tertiary">ADMIN</div>
+            <div className="font-display text-xl tracking-tight">
+              jo<span className="text-fg-secondary">ï</span>n
+            </div>
           </div>
         </div>
 

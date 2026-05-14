@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -12,6 +13,14 @@ export default async function Header() {
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-obsidian/70 border-b border-border">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
+          <Image
+            src="/logo.svg"
+            alt="join"
+            width={32}
+            height={32}
+            className="rounded-md"
+            priority
+          />
           <Wordmark />
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2 text-sm">
