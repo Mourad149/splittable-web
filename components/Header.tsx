@@ -12,16 +12,14 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-obsidian/70 border-b border-border">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center group">
           <Image
             src="/logo.svg"
             alt="join"
-            width={32}
-            height={32}
-            className="rounded-md"
+            width={64}
+            height={64}
             priority
           />
-          <Wordmark />
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2 text-sm">
           <Link
@@ -49,16 +47,6 @@ export default async function Header() {
         </nav>
       </div>
     </header>
-  );
-}
-
-function Wordmark() {
-  // Display the IDN-correct mark to users — the dotted "ï" is part of
-  // brand identity. ASCII fallback `join` is only used for DNS / URLs.
-  return (
-    <span className="font-display text-xl tracking-tight">
-      jo<span className="text-fg-secondary group-hover:text-fg transition-colors">ï</span>n
-    </span>
   );
 }
 

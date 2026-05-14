@@ -33,17 +33,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Image
             src="/logo.svg"
             alt="join"
-            width={36}
-            height={36}
-            className="rounded-md shrink-0"
+            width={72}
+            height={72}
+            className="shrink-0"
             priority
           />
-          <div>
-            <div className="text-[11px] tracking-[2px] font-bold text-fg-tertiary">ADMIN</div>
-            <div className="font-display text-xl tracking-tight">
-              jo<span className="text-fg-secondary">ï</span>n
-            </div>
-          </div>
+          <div className="text-[11px] tracking-[2px] font-bold text-fg-tertiary">ADMIN</div>
         </div>
 
         <nav className="flex flex-col gap-0.5 px-3 py-4 text-sm">
