@@ -14,9 +14,9 @@ import ConfirmDialog from "./ConfirmDialog";
 /// Severity ladder:
 ///   Force-verify — manual ID approval (skip Veriff).
 ///   Clean        — wipe avatar / moments / bio. Reversible.
-///   Ban          — anonymise in place, revoke sessions.
+///   Ban / Unban  — flag-only block on sign-in, reversible. Content stays.
 ///   Delete       — full cascade. Use sparingly.
-type Action = "force-verify" | "clean" | "ban" | "delete";
+type Action = "force-verify" | "clean" | "ban" | "unban" | "delete";
 
 const CONFIRM: Record<Action, { title: string; body: React.ReactNode; confirm: string; tone: "neutral" | "warning" | "error" }> = {
   "force-verify": {
@@ -33,9 +33,15 @@ const CONFIRM: Record<Action, { title: string; body: React.ReactNode; confirm: s
   },
   "ban": {
     title: "Ban this user?",
-    body: "Anonymises the account, revokes every session. Reviews and messages they wrote stay readable as 'Banned User'. The user can re-sign-up later but with a fresh row.",
+    body: "Flags the account so sign-ins are refused, revokes every active session. Reviews, messages, and content stay intact — you can unban from this same menu to restore access.",
     confirm: "Ban user",
     tone: "warning",
+  },
+  "unban": {
+    title: "Unban this user?",
+    body: "Clears the ban flag so the user can sign in again. They'll need to re-authenticate (sessions remain revoked from the original ban).",
+    confirm: "Unban user",
+    tone: "neutral",
   },
   "delete": {
     title: "Delete this user?",
@@ -51,7 +57,13 @@ const CONFIRM: Record<Action, { title: string; body: React.ReactNode; confirm: s
   },
 };
 
-export default function UserRowActions({ userId, isDeleted }: { userId: string; isDeleted: boolean }) {
+export default function UserRowActions({
+  userId, isDeleted, isBanned = false,
+}: {
+  userId: string;
+  isDeleted: boolean;
+  isBanned?: boolean;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState<Action | null>(null);
   const [pendingConfirm, setPendingConfirm] = useState<Action | null>(null);
@@ -80,6 +92,24 @@ export default function UserRowActions({ userId, isDeleted }: { userId: string; 
     }
   }
 
+  // Banned users get the Unban action in place of Ban — same severity
+  // visually (warning tone). Force-verify + clean stay available so an
+  // admin can still tidy up content while the ban is in effect; Delete
+  // also stays as the escalation path.
+  const menuItems: { label: string; onSelect: () => void; tone?: "warning" | "error" }[] = isBanned
+    ? [
+        { label: "Unban user",       onSelect: () => setPendingConfirm("unban"),    tone: "warning" },
+        { label: "Force-verify ID",  onSelect: () => setPendingConfirm("force-verify") },
+        { label: "Clean content",    onSelect: () => setPendingConfirm("clean") },
+        { label: "Delete account",   onSelect: () => setPendingConfirm("delete"),   tone: "error" },
+      ]
+    : [
+        { label: "Force-verify ID",  onSelect: () => setPendingConfirm("force-verify") },
+        { label: "Clean content",    onSelect: () => setPendingConfirm("clean") },
+        { label: "Ban user",         onSelect: () => setPendingConfirm("ban"),      tone: "warning" },
+        { label: "Delete account",   onSelect: () => setPendingConfirm("delete"),   tone: "error" },
+      ];
+
   const dialogConfig = pendingConfirm ? CONFIRM[pendingConfirm] : null;
 
   return (
@@ -90,14 +120,7 @@ export default function UserRowActions({ userId, isDeleted }: { userId: string; 
       >
         VIEW
       </Link>
-      <ActionMenu
-        items={[
-          { label: "Force-verify ID",  onSelect: () => setPendingConfirm("force-verify") },
-          { label: "Clean content",    onSelect: () => setPendingConfirm("clean") },
-          { label: "Ban user",         onSelect: () => setPendingConfirm("ban"),    tone: "warning" },
-          { label: "Delete account",   onSelect: () => setPendingConfirm("delete"), tone: "error" },
-        ]}
-      />
+      <ActionMenu items={menuItems} />
       {error && <span className="text-error text-[10px] ml-2">{error}</span>}
 
       <ConfirmDialog

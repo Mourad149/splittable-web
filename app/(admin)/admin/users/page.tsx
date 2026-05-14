@@ -14,6 +14,7 @@ interface AdminUser {
   phoneVerifiedAt: string | null;
   emailVerifiedAt: string | null;
   deletedAt: string | null;
+  bannedAt: string | null;
   createdAt: string;
 }
 
@@ -82,7 +83,10 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                     <div>
                       <div className="font-semibold">{u.firstName} {u.lastName}</div>
                       {u.deletedAt && (
-                        <div className="text-[11px] text-fg-tertiary">deleted</div>
+                        <div className="text-[10px] tracking-wide font-bold text-fg-tertiary mt-0.5">DELETED</div>
+                      )}
+                      {!u.deletedAt && u.bannedAt && (
+                        <div className="text-[10px] tracking-wide font-bold text-error mt-0.5">BANNED</div>
                       )}
                     </div>
                   </div>
@@ -100,7 +104,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                   {new Date(u.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <UserRowActions userId={u.id} isDeleted={!!u.deletedAt} />
+                  <UserRowActions userId={u.id} isDeleted={!!u.deletedAt} isBanned={!!u.bannedAt} />
                 </td>
               </tr>
             ))}

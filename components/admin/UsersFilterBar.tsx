@@ -39,7 +39,8 @@ export default function UsersFilterBar() {
         className="px-3 py-2.5 bg-card border border-border rounded-lg text-sm"
       >
         <option value="ACTIVE">Active</option>
-        <option value="DELETED">Deleted / banned</option>
+        <option value="BANNED">Banned</option>
+        <option value="DELETED">Deleted</option>
         <option value="ALL">All</option>
       </select>
       <button

@@ -18,6 +18,7 @@ interface AdminUserDetail {
     phoneVerifiedAt: string | null;
     emailVerifiedAt: string | null;
     deletedAt: string | null;
+    bannedAt: string | null;
     createdAt: string;
     updatedAt: string;
     appleSubjectId: string | null;
@@ -43,6 +44,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   const { user, stats } = await apiFetch<AdminUserDetail>(`/admin/users/${id}`);
 
   const isDeleted = !!user.deletedAt;
+  const isBanned = !!user.bannedAt && !isDeleted;
   const provider = user.appleSubjectId ? "Apple" : "Email / password";
 
   return (
@@ -64,17 +66,22 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           <div>
             <Heading
               title={`${user.firstName} ${user.lastName}`}
-              sub={isDeleted ? "Deleted account — anonymised" : user.email}
+              sub={
+                isDeleted ? "Deleted account — anonymised" :
+                isBanned ? `Banned ${user.bannedAt ? new Date(user.bannedAt).toLocaleString() : ""} — sign-in blocked` :
+                user.email
+              }
             />
             <div className="flex flex-wrap gap-1.5 mt-3">
               <Pill ok={user.verificationStatus === "APPROVED"} label="ID verified" />
               <Pill ok={!!user.phoneVerifiedAt} label="Phone verified" />
               <Pill ok={!!user.emailVerifiedAt} label="Email verified" />
               {isDeleted && <span className="px-2 py-0.5 rounded-md bg-error/15 text-error text-[10px] font-bold tracking-wide">DELETED</span>}
+              {isBanned && <span className="px-2 py-0.5 rounded-md bg-warning/15 text-warning text-[10px] font-bold tracking-wide">BANNED</span>}
             </div>
           </div>
         </div>
-        <UserRowActions userId={user.id} isDeleted={isDeleted} />
+        <UserRowActions userId={user.id} isDeleted={isDeleted} isBanned={isBanned} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
