@@ -56,5 +56,12 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     throw new ApiError(res.status, code);
   }
 
-  return (await res.json()) as T;
+  // Backend wraps most successful payloads as `{ data: ... }`. Unwrap
+  // automatically so callers can type the inner shape directly. Auth
+  // endpoints are exempt — those return `{ user, tokens }` at top level.
+  const json = await res.json();
+  if (json && typeof json === "object" && "data" in json && Object.keys(json).length === 1) {
+    return json.data as T;
+  }
+  return json as T;
 }

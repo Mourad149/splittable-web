@@ -1,4 +1,6 @@
-import { apiFetch } from "@/lib/api";
+import Link from "next/link";
+import { apiFetch, ApiError } from "@/lib/api";
+import { getCurrentUser } from "@/lib/auth";
 import type { TableModel } from "@/lib/types";
 import TableCard from "@/components/TableCard";
 import FilterStrip from "@/components/FilterStrip";
@@ -25,12 +27,24 @@ export default async function DiscoverPage({
   if (chip === "wild") query.energyLevel = "WILD";
   if (chip === "queer") query.isLgbtqia = "true";
 
+  // Backend's /tables endpoint is authed (excludes the requesting user's
+  // own tables, marks join status, etc.). Skip the call entirely when
+  // the visitor isn't signed in and surface a sign-in nudge instead.
+  const me = await getCurrentUser();
+
   let tables: TableModel[] = [];
   let loadError: string | null = null;
-  try {
-    tables = await apiFetch<TableModel[]>("/tables", { query, authed: false });
-  } catch (e) {
-    loadError = (e as Error).message ?? "Couldn't load tables.";
+  let needsSignIn = !me;
+  if (me) {
+    try {
+      tables = await apiFetch<TableModel[]>("/tables", { query });
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 401) {
+        needsSignIn = true;
+      } else {
+        loadError = (e as Error).message ?? "Couldn't load tables.";
+      }
+    }
   }
 
   return (
@@ -42,7 +56,9 @@ export default async function DiscoverPage({
       </section>
 
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-8">
-        {loadError ? (
+        {needsSignIn ? (
+          <SignInPromptState />
+        ) : loadError ? (
           <ErrorState message={loadError} />
         ) : tables.length === 0 ? (
           <EmptyState chip={chip} />
@@ -78,6 +94,24 @@ function Hero() {
         </p>
       </div>
     </section>
+  );
+}
+
+function SignInPromptState() {
+  return (
+    <div className="rounded-3xl border border-border bg-elevated p-10 sm:p-14 text-center max-w-2xl mx-auto">
+      <div className="eyebrow mb-3">Sign in to browse</div>
+      <h3 className="font-display text-3xl mb-3">Tables stay behind a quick sign-in.</h3>
+      <p className="text-fg-secondary mb-6">
+        Joïn keeps the listings members-only — one tap with Apple or Google and you&apos;re in.
+      </p>
+      <Link
+        href="/login"
+        className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-fg text-obsidian font-semibold hover:bg-fg/90 transition-colors"
+      >
+        Sign in
+      </Link>
+    </div>
   );
 }
 

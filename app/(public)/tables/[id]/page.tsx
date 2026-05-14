@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
+import { getCurrentUser } from "@/lib/auth";
 import type { TableModel } from "@/lib/types";
 import OpenInAppCta from "@/components/OpenInAppCta";
 import PrideFlag from "@/components/PrideFlag";
@@ -10,9 +11,12 @@ export default async function TableDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const me = await getCurrentUser();
+  if (!me) redirect(`/login?next=/tables/${id}`);
+
   let table: TableModel;
   try {
-    table = await apiFetch<TableModel>(`/tables/${id}`, { authed: false });
+    table = await apiFetch<TableModel>(`/tables/${id}`);
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) notFound();
     throw e;

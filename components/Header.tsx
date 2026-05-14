@@ -53,12 +53,17 @@ function Wordmark() {
   );
 }
 
-function Avatar({ user }: { user: { firstName: string; lastName: string; avatarUrl: string | null } }) {
+function Avatar({ user }: { user: { firstName?: string | null; lastName?: string | null; avatarUrl: string | null } }) {
   if (user.avatarUrl) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={user.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover" />;
   }
-  const initials = `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase();
+  // Defensive: SIWA users who hide their name on first sign-in (or any
+  // profile where firstName/lastName ends up empty) shouldn't crash the
+  // server render. Fall back to a glyph.
+  const first = (user.firstName ?? "").trim();
+  const last  = (user.lastName  ?? "").trim();
+  const initials = `${first[0] ?? ""}${last[0] ?? ""}`.toUpperCase() || "·";
   return (
     <span className="w-7 h-7 rounded-full bg-elevated grid place-items-center text-[11px] font-semibold">
       {initials}

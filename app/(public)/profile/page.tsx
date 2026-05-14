@@ -7,7 +7,8 @@ export default async function ProfilePage() {
   const me = await getCurrentUser();
   if (!me) redirect("/login");
 
-  const initials = `${me.firstName?.[0] ?? ""}${me.lastName?.[0] ?? ""}`.toUpperCase();
+  const initials =
+    (`${me.firstName?.[0] ?? ""}${me.lastName?.[0] ?? ""}`.toUpperCase() || "·");
   const verified = me.verificationStatus === "APPROVED";
 
   return (
