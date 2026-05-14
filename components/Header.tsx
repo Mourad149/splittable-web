@@ -1,14 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { getLocale, getT } from "@/lib/i18n";
+import LocaleToggle from "@/components/LocaleToggle";
 
 /*
  * Top nav. Editorial wordmark on the left, single primary CTA on the
- * right (Sign in OR avatar+name when authenticated). No sub-nav, no
- * megamenu — Phase 1 is intentionally one screen of intent: discover.
+ * right (Sign in OR avatar+name when authenticated). LocaleToggle
+ * sits between nav links and the CTA so the active language is always
+ * one tap away from the public surfaces this i18n round localizes.
  */
 export default async function Header() {
-  const me = await getCurrentUser();
+  const [me, locale, t] = await Promise.all([
+    getCurrentUser(),
+    getLocale(),
+    getT(),
+  ]);
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-obsidian/70 border-b border-border">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
@@ -26,8 +33,9 @@ export default async function Header() {
             href="/"
             className="hidden sm:inline-flex px-3 py-2 rounded-full text-fg-secondary hover:text-fg transition-colors"
           >
-            Discover
+            {t("nav_discover")}
           </Link>
+          <LocaleToggle current={locale} />
           {me ? (
             <Link
               href="/profile"
@@ -41,7 +49,7 @@ export default async function Header() {
               href="/login"
               className="px-4 py-2 rounded-full bg-fg text-obsidian font-semibold hover:bg-fg/90 transition-colors"
             >
-              Sign in
+              {t("nav_signin")}
             </Link>
           )}
         </nav>

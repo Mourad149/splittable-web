@@ -5,23 +5,23 @@ import QueerChip from "./QueerChip";
 
 type Chip = "all" | "tonight" | "queer" | "premium" | "chill" | "wild";
 
-const ORDER: { key: Chip; label: string }[] = [
-  { key: "all",     label: "All" },
-  { key: "tonight", label: "Tonight" },
-  { key: "queer",   label: "Queer" },
-  { key: "premium", label: "Premium" },
-  { key: "chill",   label: "Chill" },
-  { key: "wild",    label: "Wild" },
-];
+const ORDER: Chip[] = ["all", "tonight", "queer", "premium", "chill", "wild"];
 
-interface Props { selected: Chip; city: string }
+interface Props {
+  selected: Chip;
+  city: string;
+  /// Server-translated labels keyed by chip. The server-component
+  /// parent resolves these via getT() and passes them in so this
+  /// client component doesn't need its own locale lookup.
+  labels: Record<Chip, string>;
+}
 
 /*
  * Horizontal chip strip mirroring DiscoverView's filterBar — same
  * order (Queer in 3rd position), same single-select semantics, same
  * Pride-gradient treatment for the queer chip when selected.
  */
-export default function FilterStrip({ selected }: Props) {
+export default function FilterStrip({ selected, labels }: Props) {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -34,13 +34,13 @@ export default function FilterStrip({ selected }: Props) {
 
   return (
     <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {ORDER.map(({ key, label }) =>
+      {ORDER.map((key) =>
         key === "queer" ? (
           <QueerChip key={key} selected={selected === key} onClick={() => pick(key)} />
         ) : (
           <Pill
             key={key}
-            label={label}
+            label={labels[key]}
             selected={selected === key}
             onClick={() => pick(key)}
           />

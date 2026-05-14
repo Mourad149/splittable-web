@@ -5,6 +5,7 @@ import type { TableModel } from "@/lib/types";
 import TableCard from "@/components/TableCard";
 import FilterStrip from "@/components/FilterStrip";
 import OpenInAppCta from "@/components/OpenInAppCta";
+import { getT } from "@/lib/i18n";
 
 interface SearchParams {
   city?: string;
@@ -31,6 +32,15 @@ export default async function DiscoverPage({
   // own tables, marks join status, etc.). Skip the call entirely when
   // the visitor isn't signed in and surface a sign-in nudge instead.
   const me = await getCurrentUser();
+  const t = await getT();
+  const chipLabels = {
+    all:     t("landing_chip_all"),
+    tonight: t("landing_chip_tonight"),
+    queer:   t("landing_chip_queer"),
+    premium: t("landing_chip_premium"),
+    chill:   t("landing_chip_chill"),
+    wild:    t("landing_chip_wild"),
+  };
 
   let tables: TableModel[] = [];
   let loadError: string | null = null;
@@ -52,7 +62,7 @@ export default async function DiscoverPage({
       <Hero />
 
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-2 sm:mt-6">
-        <FilterStrip selected={chip} city={sp.city || "Paris"} />
+        <FilterStrip selected={chip} city={sp.city || "Paris"} labels={chipLabels} />
       </section>
 
       <section className="mx-auto max-w-6xl px-5 sm:px-8 mt-8">
