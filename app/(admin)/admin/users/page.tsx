@@ -6,6 +6,7 @@ import UsersFilterBar from "@/components/admin/UsersFilterBar";
 interface AdminUser {
   id: string;
   email: string;
+  phone: string | null;
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
@@ -61,6 +62,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
             <tr className="text-left text-[11px] tracking-[1.5px] font-bold text-fg-tertiary">
               <th className="px-4 py-3">USER</th>
               <th className="px-4 py-3">EMAIL</th>
+              <th className="px-4 py-3">PHONE</th>
               <th className="px-4 py-3">TRUST</th>
               <th className="px-4 py-3">VERIFIED</th>
               <th className="px-4 py-3">JOINED</th>
@@ -82,6 +84,9 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                     )}
                     <div>
                       <div className="font-semibold">{u.firstName} {u.lastName}</div>
+                      <div className="font-mono text-[10px] text-fg-tertiary mt-0.5" title={u.id}>
+                        {u.id.slice(0, 8)}…
+                      </div>
                       {u.deletedAt && (
                         <div className="text-[10px] tracking-wide font-bold text-fg-tertiary mt-0.5">DELETED</div>
                       )}
@@ -92,6 +97,9 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-fg-secondary text-xs">{u.email}</td>
+                <td className="px-4 py-3 text-fg-secondary text-xs font-mono">
+                  {u.phone ?? <span className="text-fg-tertiary">—</span>}
+                </td>
                 <td className="px-4 py-3">{u.trustScore}</td>
                 <td className="px-4 py-3 text-xs">
                   <span className={pillClass(u.verificationStatus === "APPROVED")}>
@@ -109,7 +117,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-fg-tertiary text-sm">
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-fg-tertiary text-sm">
                 No users match this filter.
               </td></tr>
             )}

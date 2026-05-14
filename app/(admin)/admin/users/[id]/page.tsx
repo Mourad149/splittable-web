@@ -22,6 +22,9 @@ interface AdminUserDetail {
     createdAt: string;
     updatedAt: string;
     appleSubjectId: string | null;
+    stripeCustomerId: string | null;
+    stripeAccountId: string | null;
+    apnsDeviceToken: string | null;
     preferredLanguage: string | null;
     vibeProfile: {
       musicTastes: string[];
@@ -105,12 +108,34 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       <Section title="Identity">
         <DL>
           <DT label="Email">{user.email}</DT>
-          <DT label="Phone">{user.phone ?? "—"}</DT>
+          <DT label="Phone">{user.phone ? <span className="font-mono">{user.phone}</span> : "—"}</DT>
           <DT label="Birth date">{user.birthDate ? new Date(user.birthDate).toLocaleDateString() : "—"}</DT>
           <DT label="Provider">{provider}</DT>
           <DT label="Preferred language">{user.preferredLanguage ?? "—"}</DT>
           <DT label="Created">{new Date(user.createdAt).toLocaleString()}</DT>
           <DT label="Updated">{new Date(user.updatedAt).toLocaleString()}</DT>
+          {user.bannedAt && <DT label="Banned at">{new Date(user.bannedAt).toLocaleString()}</DT>}
+          {user.deletedAt && <DT label="Deleted at">{new Date(user.deletedAt).toLocaleString()}</DT>}
+        </DL>
+      </Section>
+
+      <Section title="Technical">
+        <DL>
+          <DT label="User ID"><Mono>{user.id}</Mono></DT>
+          <DT label="Apple subject ID">
+            {user.appleSubjectId ? <Mono>{user.appleSubjectId}</Mono> : "—"}
+          </DT>
+          <DT label="Stripe customer ID">
+            {user.stripeCustomerId ? <Mono>{user.stripeCustomerId}</Mono> : "—"}
+          </DT>
+          <DT label="Stripe account ID">
+            {user.stripeAccountId ? <Mono>{user.stripeAccountId}</Mono> : "—"}
+          </DT>
+          <DT label="APNs device token">
+            {user.apnsDeviceToken
+              ? <Mono>…{user.apnsDeviceToken.slice(-12)}</Mono>
+              : "—"}
+          </DT>
         </DL>
       </Section>
 
@@ -168,5 +193,16 @@ function DT({ label, children }: { label: string; children: React.ReactNode }) {
       <dt className="text-[11px] tracking-wide font-semibold text-fg-tertiary">{label}</dt>
       <dd className="mt-1 text-fg-secondary break-words">{children}</dd>
     </div>
+  );
+}
+
+/// Monospace, copy-friendly chip for raw IDs in the Technical section.
+/// Selecting all-on-click lets a moderator double-click + ⌘C without
+/// fussing over selection edges — IDs are always copied as a unit.
+function Mono({ children }: { children: React.ReactNode }) {
+  return (
+    <code className="font-mono text-[12px] bg-elevated/60 border border-border rounded px-1.5 py-0.5 break-all select-all">
+      {children}
+    </code>
   );
 }
