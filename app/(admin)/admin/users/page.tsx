@@ -1,6 +1,7 @@
 import { apiFetch } from "@/lib/api";
 import { Heading } from "../page";
 import UserRowActions from "@/components/admin/UserRowActions";
+import UsersFilterBar from "@/components/admin/UsersFilterBar";
 
 interface AdminUser {
   id: string;
@@ -51,30 +52,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         sub={`${total.toLocaleString()} match this filter.`}
       />
 
-      <form method="get" className="mt-6 flex gap-2">
-        <input
-          type="text"
-          name="q"
-          defaultValue={q}
-          placeholder="Search name or email…"
-          className="flex-1 max-w-md px-4 py-2.5 bg-card border border-border rounded-lg text-sm placeholder:text-fg-tertiary focus:outline-none focus:border-border-strong"
-        />
-        <select
-          name="status"
-          defaultValue={status}
-          className="px-3 py-2.5 bg-card border border-border rounded-lg text-sm"
-        >
-          <option value="ACTIVE">Active</option>
-          <option value="DELETED">Deleted / banned</option>
-          <option value="ALL">All</option>
-        </select>
-        <button
-          type="submit"
-          className="px-4 py-2.5 bg-fg text-obsidian rounded-lg text-sm font-semibold"
-        >
-          Search
-        </button>
-      </form>
+      <UsersFilterBar />
 
       <div className="mt-6 border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
